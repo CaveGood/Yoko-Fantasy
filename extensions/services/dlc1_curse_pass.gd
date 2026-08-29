@@ -1,5 +1,7 @@
 extends Reference
 
+const HEALING_STAR_SCENE_PATH: String = "res://mods-unpacked/Yoko-Fantasy/content/entities/pets/healing_star/scene/healing_star.tscn"
+
 # ══════════════════════════════════════════ Extension ══════════════════════════════════════════ #
 func apply(
 	original_item: ItemParentData,
@@ -35,6 +37,9 @@ func _fantasy_curse_item(
 
 		var effect_modifier: float = dlc_1_data._get_cursed_item_effect_modifier(turn_randomization_off, min_modifier)
 		var new_effect: Effect = effect.duplicate()
+		if new_effect is PetEffect and new_effect.scene != null and \
+				new_effect.scene.resource_path == HEALING_STAR_SCENE_PATH:
+			new_effect.value = 2
 		var id: String = new_effect.get_id()
 		var key: int = new_effect.key_hash
 		var cskey: int = new_effect.custom_key_hash
