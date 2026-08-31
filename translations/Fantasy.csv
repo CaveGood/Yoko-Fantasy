@@ -1,5 +1,8 @@
 keys,en,fr,zh,ja,ko,zh_TW,ru,pl,es,pt,de,tr,it
 FANTASY_MOD_NAME,Sylvan Fantasy,Fantaisie sylvestre,幻界树海,シルヴァン・ファンタジー,실반 판타지,幻界樹海,Лесная фантазия,Leśna fantazja,Fantasía silvana,Fantasia silvestre,Waldfantasie,Orman Fantazisi,Fantasia silvestre
+WEAPON_FANTASY_FINGER_SNAP,Finger Snap,Claquement de doigts,响指,指パッチン,손가락 튕기기,響指,Щелчок пальцами,Pstryknięcie palcami,Chasquido de dedos,Estalo de dedos,Fingerschnippen,Parmak Şıklatma,Schiocco di dita
+WEAPON_FANTASY_HANDBELL,Handbell,Clochette,手摇铃,ハンドベル,핸드벨,手搖鈴,Ручной колокольчик,Dzwonek ręczny,Campanilla,Sino de mão,Handglocke,El çanı,Campanella
+WEAPON_FANTASY_HARP,Harp,Harpe,竖琴,ハープ,하프,豎琴,Арфа,Harfa,Arpa,Harpa,Harfe,Arp,Arpa
 ZONE_FANTASY,Fantasy,Fantaisie,幻界,ファンタジー,판타지,幻界,Фэнтези,Fantazja,Fantasía,Fantasia,Fantasie,Fantazi,Fantasia
 BG_FORESTLAND,Forestland,Contrée boisée,树海,森林地,삼림지,樹海,Лесные угодья,Leśna Kraina,Tierra forestal,Terra florestal,Waldland,Ormanlık,Terra boscosa
 BG_FORESTLAND_NIGHT,Forestland-Night,Contrée boisée (nuit),树海-夜,森林地・夜,삼림지(밤),樹海-夜,Лесные угодья (ночь),Leśna Kraina (noc),Tierra forestal (noche),Terra florestal (noite),Waldland (Nacht),Ormanlık (gece),Terra boscosa (notte)
