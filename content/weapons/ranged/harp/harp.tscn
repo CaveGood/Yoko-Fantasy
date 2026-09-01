@@ -1,9 +1,8 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://weapons/weapon.tscn" type="PackedScene" id=1]
 [ext_resource path="res://resources/shaders/outline.gdshader" type="Shader" id=2]
 [ext_resource path="res://mods-unpacked/Yoko-Fantasy/content/weapons/ranged/harp/harp_body.webp" type="Texture" id=3]
-[ext_resource path="res://mods-unpacked/Yoko-Fantasy/content/weapons/ranged/harp/harp_strings.webp" type="Texture" id=4]
 [ext_resource path="res://mods-unpacked/Yoko-Fantasy/content/weapons/ranged/harp/harp.gd" type="Script" id=5]
 
 [sub_resource type="ShaderMaterial" id=1]
@@ -29,9 +28,6 @@ outline_shader_mat = SubResource( 1 )
 [node name="Sprite" parent="." index="0"]
 position = Vector2( 24, 0 )
 texture = ExtResource( 3 )
-
-[node name="Strings" type="Sprite" parent="Sprite"]
-texture = ExtResource( 4 )
 
 [node name="Hitbox" parent="Sprite" index="0"]
 visible = false
