@@ -52,9 +52,7 @@ func init_converge(
     velocity = Vector2.ZERO
     sinusoidal_motion = Vector2.ZERO
 
-    _setting_opacity = 1.0
-    if is_instance_valid(ProgressData) and "settings" in ProgressData and "projectile_opacity" in ProgressData.settings:
-        _setting_opacity = clamp(float(ProgressData.settings.projectile_opacity), 0.0, 1.0)
+    _setting_opacity = FantasyProjectileVisualUtils.get_opacity()
 
     _inward_dir = (target_center - spawn_pos).normalized()
     if _inward_dir == Vector2.ZERO:

@@ -77,7 +77,7 @@ func start_strike(target_pos: Vector2, _target_node: Node = null, scale_mult: fl
 	_active = true
 	_elapsed = 0.0
 	modulate = tint_color
-	modulate.a = ProgressData.settings.projectile_opacity
+	modulate.a = FantasyProjectileVisualUtils.get_opacity()
 
 	_ground_seal.visible = true
 	_ground_seal.scale = Vector2.ONE * (_base_seal_scale * 0.3)

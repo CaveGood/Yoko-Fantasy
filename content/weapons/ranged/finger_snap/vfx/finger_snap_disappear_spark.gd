@@ -27,9 +27,7 @@ func play_disappear(pos: Vector2, main: Node, pool_id: int) -> void:
 	_active = true
 	visible = true
 
-	_opacity = 1.0
-	if is_instance_valid(ProgressData) and "settings" in ProgressData and "projectile_opacity" in ProgressData.settings:
-		_opacity = clamp(float(ProgressData.settings.projectile_opacity), 0.0, 1.0)
+	_opacity = FantasyProjectileVisualUtils.get_opacity()
 
 	if is_instance_valid(_orb):
 		_orb.visible = true
