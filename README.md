@@ -1,264 +1,315 @@
 <div align="center">
 
-**A gameplay expansion mod for Brotato**
+# Yoko-Fantasy
 
-Expanding Brotato with new gameplay systems, combat mechanics, enemies, items, weapons, content resources, and UI behavior.
+**A systems-heavy fantasy expansion for Brotato**
 
-[![GDScript](https://img.shields.io/badge/GDScript-Godot-478CBF?style=flat-square)](https://godotengine.org/)
-[![Mod Loader](https://img.shields.io/badge/Mod%20Loader-6.0.0-5965FF?style=flat-square)](#-installation)
-[![Version](https://img.shields.io/badge/Version-0.0.1-8A9E8B?style=flat-square)](#-compatibility--dependencies)
-[![License](https://img.shields.io/badge/License-MIT-9E8F7E?style=flat-square)](LICENSE)
+New characters, jobs, weapons, items, creatures, combat behaviors, progression systems, maps, UI integrations, and localized content — implemented as a Brotato Mod Loader extension rather than a standalone game project.
 
-[Overview](#-overview) • [Features](#-features) • [Installation](#-installation) • [Architecture](#-architecture) • [Development](#-development)
+[![GDScript](https://img.shields.io/badge/GDScript-Godot-478CBF?style=flat-square&logo=godot-engine&logoColor=white)](https://godotengine.org/)
+[![Mod Loader](https://img.shields.io/badge/Mod%20Loader-6.0.0-5965FF?style=flat-square)](#compatibility)
+[![License](https://img.shields.io/github/license/CYoJkoY/Yoko-Fantasy?style=flat-square)](LICENSE)
+[![Workflow](https://img.shields.io/github/actions/workflow/status/CYoJkoY/Yoko-Fantasy/release.yml?style=flat-square&label=release)](.github/workflows/release.yml)
+
+[Overview](#overview) · [Systems](#systems) · [Architecture](#architecture) · [Installation](#installation) · [Development](#development) · [Compatibility](#compatibility)
 
 </div>
 
 ---
 
-## 📖 Overview
+## Overview
 
-**Fantasy Sylvar** is a **Brotato Mod Loader** project written in GDScript. It integrates with the base game through targeted script extensions and custom resource definitions rather than modifying the game as a standalone project.
+Yoko-Fantasy is a **Brotato Mod Loader** project written in GDScript. Its core purpose is to add a connected set of fantasy-themed gameplay systems and content while extending the base game's existing runtime instead of replacing it.
 
-The project is organized around independent gameplay systems and extension points. `mod_main.gd` acts as the integration entry point, while content resources, extension scripts, and localization files provide the implementation and data used by the mod.
+The project is built around three layers:
 
-> **Development status:** Fantasy Sylvar is under active development. The current manifest version is `0.0.1`, with Mod Loader compatibility declared as `6.0.0`.
+- **Content resources** define characters, jobs, weapons, items, entities, enemies, effects, maps, zones, and other game data.
+- **Script extensions** patch specific Brotato systems such as player state, run data, weapons, enemies, spawning, shops, waves, entities, and menus.
+- **NewContent integration** registers the mod's resources through `Yoko-NewContentLoader` and keeps the content layer separate from the runtime extensions.
 
-## ✨ Features
+The result is a mod architecture where a mechanic can be represented by the combination of a content resource, one or more reusable effects, and a narrowly scoped extension to the base game system that owns the behavior.
 
-### 🧩 Gameplay Systems
+## Systems
 
-- **Job system** integrated into run data, gameplay menus, and the end-of-run flow.
-- **Soul mechanics** spanning player statistics, run data, and soul-related consumables.
-- **Holy mechanics** affecting items and enemy behavior.
-- **Erosion mechanics** implemented through dedicated items and effects.
-- **Limited-item mechanics** for restricted item pools and progression rules.
+Yoko-Fantasy is not just a collection of isolated items. Its current source tree connects several gameplay systems across the run lifecycle.
 
-### ⚔️ Combat & Weapons
+| System | What it covers |
+| :--- | :--- |
+| **Jobs** | Job resources, job registration, run integration, menu flow, and end-of-run handling |
+| **Soul** | Soul statistics, soul consumables, drop logic, and player/run integration |
+| **Holy** | Holy-related statistics, item interactions, and enemy behavior |
+| **Erosion** | Erosion-focused items and associated effects |
+| **Limited Items** | Restricted item pools and progression bonuses tied to limited items |
+| **Combat Effects** | Kill progression, reload triggers, weapon switching, lightning chains, hit procs, damage clamping, reflection, and critical-damage interactions |
+| **Enemies** | Custom enemies, cursed behavior, targeting logic, special spawning, healing, and world interactions |
+| **Companions & Entities** | Pets, turrets, gardens, wandering bots, special entities, and their custom behaviors |
+| **Shop & Waves** | Shop curses, reroll interactions, tier-specific upgrades, synthesis, extra enemies, and extra elites |
+| **World Content** | Fantasy zones, backgrounds, title-screen resources, special world entities, and map-specific behavior |
+| **UI & Localization** | Menu extensions, cooperative focus behavior, localized entity descriptions, and translation resources |
 
-The weapon and combat extensions currently cover multiple conditional and progression-based behaviors:
+### Representative content
 
-- Kill-based stat progression.
-- Reload triggers from shooting and critical hits.
-- Conditional weapon switching.
-- Lightning-chain effects on hit.
-- Weapon hit procs.
-- Critical-damage overflow handling.
-- Structure-related stat scaling.
-- Damage clamping and reflection.
-- Consumable-triggered damage and stat effects.
+The resource graph includes concrete content such as Holy Battleaxe variants, Blazing Path variants, Prism Tower, Healing Star, Soul Link, Crow, fantasy pets, plant-themed enemies, and custom enemy attack behaviors. These are registered through the same content-loading layer rather than being hard-coded into a single gameplay script.
 
-### 👾 Enemies & World Content
+The repository also contains dedicated attack behaviors for patterns such as lasers, leaves, maples, slow fields, surrounding targets, waving attacks, and improved shooting behavior.
 
-- Plant-themed enemy extensions.
-- World Tree interactions and damage restrictions.
-- Cursed enemy behavior.
-- Additional enemy spawning rules.
-- Kill-triggered buffs and healing.
-- Conditional enemy stat changes.
-- Enemy target-detection behavior.
-- Lootworm-related extensions.
-- Special interactions between enemies and world entities.
+## Architecture
 
-### 🛒 Shop & Run Systems
+The important architectural boundary is between **data registration** and **base-game behavior**.
 
-- Stat-based curses when entering or rerolling the shop.
-- Tier-specific weapon upgrades.
-- Conversion of selected weapons into items.
-- Limited-item bonuses.
-- Weapon-set bonuses.
-- Shop synthesis behavior.
-- Additional elite and enemy spawning rules.
+```text
+                         Brotato
+                            │
+                            ▼
+                    Brotato Mod Loader
+                            │
+             ┌──────────────┴──────────────┐
+             │                             │
+             ▼                             ▼
+       mod_main.gd                 FantasyNewContent.gd
+             │                             │
+             │                    Yoko-NewContentLoader
+             │                             │
+             │                 ┌───────────┴───────────┐
+             │                 │                       │
+             ▼                 ▼                       ▼
+     Script Extensions    Content Resources       Translations
+             │                 │                       │
+     ┌───────┼────────┐        │              localized strings
+     │       │        │        │
+     ▼       ▼        ▼        ▼
+   Player  Combat   World   Characters / Jobs
+   / Run   / Shop   / UI   Weapons / Items / Entities
+```
 
-### 🖥️ UI & Localization
+### `mod_main.gd`
 
-The project extends gameplay and menu UI entry points and provides reusable localized entity-stat descriptions. Localization resources are kept separately under `translations/`.
+`mod_main.gd` is the runtime integration point. It installs targeted extensions for systems including:
 
-## 🚀 Installation
+- player and player-run data
+- run data and linked stats
+- melee and ranged weapons
+- enemy and neutral entities
+- entity spawning and entity services
+- wave management
+- shop behavior
+- turrets, gardens, and wandering bots
+- music management
+- gameplay and menu UI
+- lootworm behavior
 
-Fantasy Sylvar is intended to be installed as a **Brotato Mod Loader** package.
+The extension list is deliberately explicit. Each file modifies the game system that owns a particular behavior instead of introducing a second parallel game loop.
+
+### `FantasyNewContent.gd`
+
+`FantasyNewContent.gd` extends `Yoko-NewContentLoader`'s content integration. It registers the mod's job resources and supplies the custom consumable-selection logic used for Souls.
+
+Soul drops are calculated from the project's configured base chance, player luck, Holy statistics, and the mod's additional Soul-drop statistic. The implementation also caps the luck multiplier, keeping the mechanic bounded in code rather than relying on documentation alone.
+
+### Resource-driven content
+
+The main content manifests are:
+
+- `NewContentData.tres` — primary content registration.
+- `NewContentDataDLC1.tres` — additional content registration.
+- `FantasyNewContent.gd` — custom registration and content hooks.
+
+This allows the content itself to remain inspectable as Godot resources while the extension layer handles interactions with existing Brotato systems.
+
+## Installation
+
+Yoko-Fantasy is intended to run through **Brotato Mod Loader**.
 
 ### Requirements
 
-- **Brotato**
-- **Brotato Mod Loader 6.0.0** or a compatible version
-- **Yoko-NewContentLoader**
-- **Yoko-MoreStatsContainer**
+- Brotato
+- Brotato Mod Loader **6.0.0**
+- [`Yoko-NewContentLoader`](https://github.com/CYoJkoY/Yoko-NewContentLoader)
+- [`Yoko-MoreStatsContainer`](https://github.com/CYoJkoY/Yoko-MoreStatsContainer)
 
-The current `manifest.json` declares `Yoko-NewContentLoader` and `Yoko-MoreStatsContainer` as dependencies and declares Mod Loader `6.0.0` as the compatible Mod Loader version.
+These are the dependencies currently declared by `manifest.json`. The manifest does not currently declare a compatible Brotato game-version list, so game-version compatibility should be verified against the installed mod stack.
 
-### From a Release
+### Release installation
 
-1. Install Brotato.
-2. Install a compatible Brotato Mod Loader version.
-3. Install the required dependencies.
-4. Download a Fantasy Sylvar release package.
-5. Extract the mod into your Mod Loader mods directory.
-6. Start Brotato and verify that the mod is loaded by Mod Loader.
+1. Install Brotato and a compatible Brotato Mod Loader.
+2. Install `Yoko-NewContentLoader` and `Yoko-MoreStatsContainer`.
+3. Download the Yoko-Fantasy release ZIP.
+4. Place the ZIP in the Mod Loader `mods` directory according to your Mod Loader installation.
+5. Start Brotato and confirm that the mod and its dependencies are loaded.
 
-### From Source
+The repository's release workflow builds a Mod Loader package under `mods-unpacked/Yoko-Fantasy/`, generates Godot import data when imported assets require it, validates the resulting ZIP, and publishes the package for tagged releases.
+
+### Build from source
 
 ```bash
 git clone https://github.com/CYoJkoY/Yoko-Fantasy.git
 cd Yoko-Fantasy
 ```
 
-Deploy the repository through your normal Brotato Mod Loader development workflow.
+For development, use the same Brotato Mod Loader development layout used by the project. This repository is a **mod source tree**, not a standalone Godot game project, so a normal root `project.godot` is intentionally absent.
 
-> **Important:** This repository is a mod source tree, not a standalone Godot game project. A root `project.godot` is therefore not required by this repository structure.
+## Development
 
-## ⚙️ Architecture
+The project uses **Godot 3.x-era GDScript and Godot resource files** together with Brotato Mod Loader's script-extension mechanism.
 
-Fantasy Sylvar uses **Mod Loader script extensions** as its primary integration mechanism.
-
-The runtime flow is centered around `mod_main.gd`:
+When adding a mechanic, keep the implementation split according to responsibility:
 
 ```text
-Brotato
+New mechanic
    │
-   ▼
-Brotato Mod Loader
+   ├── Content data / Resource
+   │       └── content/...
    │
-   ▼
-mod_main.gd
+   ├── Reusable effect / behavior
+   │       └── content/... or extensions/...
    │
-   ├── Script extensions
-   │     ├── Player / Run Data
-   │     ├── Weapons
-   │     ├── Enemies / Spawning
-   │     ├── Shop / Waves
-   │     ├── Turrets / Entities
-   │     └── UI / Menus
+   ├── Base-game integration
+   │       └── extensions/<system>.gd
    │
-   ├── Content resources
-   │     ├── NewContentData.tres
-   │     └── NewContentDataDLC1.tres
-   │
-   └── Localization
-         └── translations/
+   └── Player-facing text
+           └── translations/...
 ```
 
-This keeps gameplay changes close to the base-game systems they extend instead of concentrating all behavior in one script.
+A practical development sequence is:
 
-| Component | Responsibility |
-|---|---|
-| `mod_main.gd` | Mod entry point and script-extension registration |
-| `FantasyNewContent.gd` | New-content integration entry point |
-| `NewContentData.tres` | Main content resource definitions |
-| `NewContentDataDLC1.tres` | Additional content resource definitions |
-| `content/` | Content resources and supporting data |
-| `extensions/` | Base-game script extensions |
-| `translations/` | Localization resources |
-| `manifest.json` | Mod metadata, dependencies, and compatibility information |
+1. Identify the Brotato system that owns the behavior.
+2. Add the content resource or reusable behavior under `content/`.
+3. Extend the corresponding base-game script under `extensions/` only when integration is required.
+4. Register the extension in `mod_main.gd`.
+5. Register the content through the NewContent resource pipeline.
+6. Add or update localization resources.
+7. Test with the declared Mod Loader and dependency versions.
 
-## 🧠 Implementation Highlights
+Keep extensions focused. If a change belongs to `weapon_service.gd`, `wave_manager.gd`, or `base_shop.gd`, avoid moving that responsibility into an unrelated global script.
 
-The current extension set targets a broad range of base-game systems, including:
-
-- Player and player-run data.
-- Run data and linked statistics.
-- Melee and ranged weapons.
-- Enemies and neutral entities.
-- Entity spawning and entity services.
-- Wave management.
-- Shops and shop-related progression.
-- Turrets, gardens, and wandering bots.
-- Gameplay and menu UI.
-- Music management.
-
-The extension-oriented structure provides three practical benefits:
-
-1. **Localized changes** — each extension is associated with a specific game responsibility.
-2. **Composable mechanics** — separate systems can interact without requiring one monolithic gameplay script.
-3. **Maintainability** — individual systems can be changed without restructuring the entire mod.
-
-## 📁 Project Structure
+## Project Structure
 
 ```text
 Yoko-Fantasy/
-├── 📁 .github/                 # Repository automation and metadata
-├── 📁 assets/                  # Project assets
-├── 📁 content/                 # Content resources and data
-├── 📁 extensions/              # Base-game script extensions
-├── 📁 translations/            # Localization resources
-├── 📄 FantasyNewContent.gd     # New-content integration
-├── 📄 NewContentData.tres      # Main content resource
-├── 📄 NewContentDataDLC1.tres  # Additional content resource
-├── 📄 manifest.json            # Mod metadata and dependencies
-├── 📄 mod_main.gd              # Mod entry point
-├── 📄 .editorconfig
-├── 📄 .gitattributes
-├── 📄 .gitignore
-├── 📄 LICENSE
-└── 📄 README.md
+├── .github/
+│   └── workflows/
+│       └── release.yml              # Release packaging and validation
+├── assets/                          # Repository-level visual assets
+├── content/
+│   ├── attack_behaviors/            # Custom attack logic
+│   ├── characters/                  # Character resources and effects
+│   ├── entities/                    # Enemies, pets, turrets, and entities
+│   ├── items/                       # Item resources
+│   ├── jobs/                        # Job definitions
+│   ├── maps/                        # Background and map resources
+│   ├── specials/                    # Special gameplay entities/behaviors
+│   ├── weapons/                     # Melee and ranged weapons
+│   ├── zones/                       # Fantasy zone data
+│   └── ...                          # Additional content resources
+├── extensions/                      # Brotato base-game extensions
+├── translations/                    # Localization resources
+├── FantasyNewContent.gd             # Custom NewContent integration
+├── NewContentData.tres              # Main content registration
+├── NewContentDataDLC1.tres          # Additional content registration
+├── manifest.json                    # Mod metadata and dependencies
+├── mod_main.gd                      # Mod Loader entry point
+└── LICENSE
 ```
 
-## 🛠️ Development
+The exact content tree is intentionally broader than the summary above; `content/` is the data-heavy part of the project, while `extensions/` contains the integration layer.
 
-The project is primarily written in **GDScript** and follows the Brotato Mod Loader extension model.
+## Release Pipeline
 
-When implementing a new mechanic:
+Releases are automated through `.github/workflows/release.yml`.
 
-1. Identify the base-game system that owns the behavior.
-2. Add or modify the corresponding extension under `extensions/`.
-3. Register the extension in `mod_main.gd`.
-4. Add new content to the appropriate resource or `content/` directory.
-5. Add user-facing strings to `translations/`.
-6. Test the change with the declared Mod Loader and dependency versions.
+The workflow is designed around the actual Mod Loader packaging requirements rather than simply zipping the Git repository:
 
-Keep gameplay logic, content definitions, UI integration, and localization separated where practical.
+```text
+Git tag vX.Y.Z
+      │
+      ▼
+Validate version tag
+      │
+      ▼
+Read manifest metadata
+      │
+      ▼
+Create temporary Godot project
+      │
+      ▼
+Import assets with Godot
+      │
+      ▼
+Stage mods-unpacked/Yoko-Fantasy/
+      │
+      ├── include generated .import data when required
+      ├── exclude repository-only CI metadata
+      └── update manifest version for the release
+      │
+      ▼
+Build + verify ZIP
+      │
+      ▼
+Upload artifact + GitHub Release
+```
 
-## 📋 Compatibility & Dependencies
+The workflow validates the `vX.Y.Z` tag format, checks the manifest, imports resources with Godot 3.7-dev1, verifies the ZIP structure, checks the packaged manifest version, and publishes the resulting release artifact.
 
-The current manifest declares:
+This distinction matters for this project because imported Godot assets are part of the runtime packaging process even though the generated import directory is not committed to the repository.
 
-| Component | Value |
-|---|---|
+## Compatibility
+
+The current `manifest.json` declares the following metadata:
+
+| Component | Declared value |
+| :--- | :--- |
+| Mod name | `Fantasy` |
+| Namespace | `Yoko` |
+| Repository | `Yoko-Fantasy` |
+| Mod version | `0.0.1` |
 | Mod Loader | `6.0.0` |
-| Dependency | `Yoko-NewContentLoader` |
-| Dependency | `Yoko-MoreStatsContainer` |
-| Mod Version | `0.0.1` |
-| Project Name | `Fantasy Sylvar` |
-| Contributors | `CYoJkoY`, `CaveGood` |
-| Compatible Game Versions | Not specified in the manifest |
+| Required dependency | `Yoko-NewContentLoader` |
+| Required dependency | `Yoko-MoreStatsContainer` |
+| Compatible Brotato versions | Not specified |
+| Authors | `CYoJkoY`, `CaveGood` |
 
-Because the manifest does not currently declare a compatible Brotato game-version list, compatibility should be verified against the user's installed game, Mod Loader, and dependency versions.
+The manifest is the source of truth for the declared dependency and Mod Loader requirements. Do not interpret an empty `compatible_game_version` array as a claim of universal Brotato compatibility.
 
-## 🤝 Contributing
+## Contributing
 
-Bug reports, gameplay feedback, and code contributions are welcome.
-
-Fantasy Sylvar is developed collaboratively. Contributors are credited as project members rather than attributing the project to a single individual.
+Bug reports, gameplay feedback, balance observations, content contributions, and code changes are useful.
 
 When reporting a problem, include:
 
-- Brotato version.
-- Mod Loader version.
-- Fantasy Sylvar version.
-- Versions of the required dependencies.
-- A clear description of the problem.
-- Reproduction steps and relevant logs when available.
+- Brotato version
+- Mod Loader version
+- Yoko-Fantasy version
+- versions of both required dependencies
+- reproduction steps
+- relevant logs or screenshots when available
 
-For code contributions, keep changes focused and preserve the existing extension-based architecture.
+For code changes, preserve the project's separation between content resources and base-game extensions. New behavior should be attached to the narrowest appropriate extension point rather than added as a monolithic system.
 
-## 👥 Project Members
+## Project Members
 
-Fantasy Sylvar is a collaborative project. The current repository history identifies the following project contributors:
+The current manifest credits:
 
 - **CYoJkoY**
 - **CaveGood**
 
-Contributions may include gameplay programming, systems design, content implementation, visual assets, effects, balancing, testing, documentation, and other project work.
+## License
 
-## 📄 License
+Yoko-Fantasy is distributed under the **MIT License**. See [`LICENSE`](LICENSE) for the complete text.
 
-Fantasy Sylvar is released under the **MIT License**. Copyright © 2025 CYoJkoY and project contributors.
+## Support the Author
 
-See [`LICENSE`](LICENSE) for the complete license text.
+If this project saves you time or improves your Brotato modding workflow, consider supporting its continued development.
+
+<div align="center">
+  <a href="https://cyojkoy.github.io/Payment/">
+    <img src="https://img.shields.io/badge/Support_the_Author-9E8F7E?style=for-the-badge&logo=buy-me-a-coffee&logoColor=BEB8AE" alt="Support the Author">
+  </a>
+</div>
 
 ---
 
 <div align="center">
 
-**Fantasy Sylvar** · A collaborative Brotato content expansion project
+**Yoko-Fantasy** · Fantasy gameplay systems and content for Brotato
 
 </div>
