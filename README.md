@@ -2,16 +2,17 @@
 
 # Yoko-Fantasy
 
-**A systems-heavy fantasy expansion for Brotato**
+**A systems-heavy fantasy expansion for Brotato.**
 
-New characters, jobs, weapons, items, creatures, combat behaviors, progression systems, maps, UI integrations, and localized content — implemented as a Brotato Mod Loader extension rather than a standalone game project.
+Custom characters, jobs, weapons, items, enemies, combat effects, progression systems, maps, UI integrations, and localization — built as a Brotato Mod Loader extension.
 
-[![GDScript](https://img.shields.io/badge/GDScript-Godot-478CBF?style=flat-square&logo=godot-engine&logoColor=white)](https://godotengine.org/)
-[![Mod Loader](https://img.shields.io/badge/Mod%20Loader-6.0.0-5965FF?style=flat-square)](#compatibility)
+[![Latest Release](https://img.shields.io/github/v/release/CYoJkoY/Yoko-Fantasy?display_name=tag&sort=semver&style=flat-square)](https://github.com/CYoJkoY/Yoko-Fantasy/releases)
+[![Build](https://img.shields.io/github/actions/workflow/status/CYoJkoY/Yoko-Fantasy/release.yml?style=flat-square&label=build)](https://github.com/CYoJkoY/Yoko-Fantasy/actions/workflows/release.yml)
+[![Mod Loader](https://img.shields.io/badge/Mod%20Loader-6.3.0-5965FF?style=flat-square)](#compatibility)
+[![Godot](https://img.shields.io/badge/Godot-3.x-478CBF?style=flat-square&logo=godot-engine&logoColor=white)](https://godotengine.org/)
 [![License](https://img.shields.io/github/license/CYoJkoY/Yoko-Fantasy?style=flat-square)](LICENSE)
-[![Workflow](https://img.shields.io/github/actions/workflow/status/CYoJkoY/Yoko-Fantasy/release.yml?style=flat-square&label=release)](.github/workflows/release.yml)
 
-[Overview](#overview) · [Systems](#systems) · [Architecture](#architecture) · [Installation](#installation) · [Development](#development) · [Compatibility](#compatibility)
+[Overview](#overview) · [Systems](#systems) · [Architecture](#architecture) · [Installation](#installation) · [Development](#development)
 
 </div>
 
@@ -19,286 +20,177 @@ New characters, jobs, weapons, items, creatures, combat behaviors, progression s
 
 ## Overview
 
-Yoko-Fantasy is a **Brotato Mod Loader** project written in GDScript. Its core purpose is to add a connected set of fantasy-themed gameplay systems and content while extending the base game's existing runtime instead of replacing it.
+Yoko-Fantasy is a content and systems expansion for Brotato. The project combines resource-driven content with focused script extensions so new mechanics can use Brotato's existing runtime instead of introducing a second gameplay framework.
 
-The project is built around three layers:
+The architecture is split into three layers:
 
-- **Content resources** define characters, jobs, weapons, items, entities, enemies, effects, maps, zones, and other game data.
-- **Script extensions** patch specific Brotato systems such as player state, run data, weapons, enemies, spawning, shops, waves, entities, and menus.
-- **NewContent integration** registers the mod's resources through `Yoko-NewContentLoader` and keeps the content layer separate from the runtime extensions.
+```text
+Content resources
+     │
+     ├── Characters / Jobs / Weapons / Items / Entities / Maps
+     │
+     ▼
+NewContent registration
+     │
+     ▼
+Targeted script extensions
+     │
+     ▼
+Brotato runtime systems
+```
 
-The result is a mod architecture where a mechanic can be represented by the combination of a content resource, one or more reusable effects, and a narrowly scoped extension to the base game system that owns the behavior.
+This keeps data inspectable in Godot resources while behavior that needs deeper integration remains isolated in `extensions/`.
 
 ## Systems
 
-Yoko-Fantasy is not just a collection of isolated items. Its current source tree connects several gameplay systems across the run lifecycle.
-
-| System | What it covers |
+| System | Scope |
 | :--- | :--- |
-| **Jobs** | Job resources, job registration, run integration, menu flow, and end-of-run handling |
-| **Soul** | Soul statistics, soul consumables, drop logic, and player/run integration |
+| **Jobs** | Job resources, registration, run integration, menu flow, and end-of-run handling |
+| **Soul** | Soul statistics, consumables, drops, and player/run integration |
 | **Holy** | Holy-related statistics, item interactions, and enemy behavior |
-| **Erosion** | Erosion-focused items and associated effects |
-| **Limited Items** | Restricted item pools and progression bonuses tied to limited items |
-| **Combat Effects** | Kill progression, reload triggers, weapon switching, lightning chains, hit procs, damage clamping, reflection, and critical-damage interactions |
-| **Enemies** | Custom enemies, cursed behavior, targeting logic, special spawning, healing, and world interactions |
-| **Companions & Entities** | Pets, turrets, gardens, wandering bots, special entities, and their custom behaviors |
-| **Shop & Waves** | Shop curses, reroll interactions, tier-specific upgrades, synthesis, extra enemies, and extra elites |
-| **World Content** | Fantasy zones, backgrounds, title-screen resources, special world entities, and map-specific behavior |
-| **UI & Localization** | Menu extensions, cooperative focus behavior, localized entity descriptions, and translation resources |
+| **Erosion** | Erosion-focused items and effects |
+| **Limited Items** | Restricted item pools and progression bonuses |
+| **Combat** | Kill progression, reload triggers, weapon switching, lightning chains, hit effects, reflection, and critical-damage interactions |
+| **Enemies** | Custom enemies, cursed behavior, targeting, spawning, healing, and world interactions |
+| **Entities** | Pets, turrets, gardens, wandering bots, and other special entities |
+| **Shop & Waves** | Shop interactions, rerolls, synthesis, extra enemies, elites, and wave behavior |
+| **World** | Fantasy zones, backgrounds, title-screen resources, and map-specific behavior |
+| **UI & Localization** | Menu integration, cooperative focus handling, descriptions, and translations |
 
-### Representative content
-
-The resource graph includes concrete content such as Holy Battleaxe variants, Blazing Path variants, Prism Tower, Healing Star, Soul Link, Crow, fantasy pets, plant-themed enemies, and custom enemy attack behaviors. These are registered through the same content-loading layer rather than being hard-coded into a single gameplay script.
-
-The repository also contains dedicated attack behaviors for patterns such as lasers, leaves, maples, slow fields, surrounding targets, waving attacks, and improved shooting behavior.
+Representative content includes Holy and Blazing Path weapon variants, Prism Tower, Healing Star, Soul Link, Crow, fantasy pets, plant-themed enemies, and custom attack behaviors.
 
 ## Architecture
 
-The important architectural boundary is between **data registration** and **base-game behavior**.
-
-```text
-                         Brotato
-                            │
-                            ▼
-                    Brotato Mod Loader
-                            │
-             ┌──────────────┴──────────────┐
-             │                             │
-             ▼                             ▼
-       mod_main.gd                 FantasyNewContent.gd
-             │                             │
-             │                    Yoko-NewContentLoader
-             │                             │
-             │                 ┌───────────┴───────────┐
-             │                 │                       │
-             ▼                 ▼                       ▼
-     Script Extensions    Content Resources       Translations
-             │                 │                       │
-     ┌───────┼────────┐        │              localized strings
-     │       │        │        │
-     ▼       ▼        ▼        ▼
-   Player  Combat   World   Characters / Jobs
-   / Run   / Shop   / UI   Weapons / Items / Entities
-```
-
 ### `mod_main.gd`
 
-`mod_main.gd` is the runtime integration point. It installs targeted extensions for systems including:
+`mod_main.gd` is the main runtime integration point. It registers targeted extensions for player/run data, weapons, enemies and neutral entities, spawning, waves, shops, turrets, gardens, wandering bots, music, menus, and other systems used by the expansion.
 
-- player and player-run data
-- run data and linked stats
-- melee and ranged weapons
-- enemy and neutral entities
-- entity spawning and entity services
-- wave management
-- shop behavior
-- turrets, gardens, and wandering bots
-- music management
-- gameplay and menu UI
-- lootworm behavior
-
-The extension list is deliberately explicit. Each file modifies the game system that owns a particular behavior instead of introducing a second parallel game loop.
+The extension list is explicit so each behavior remains attached to the Brotato system that owns it.
 
 ### `FantasyNewContent.gd`
 
-`FantasyNewContent.gd` extends `Yoko-NewContentLoader`'s content integration. It registers the mod's job resources and supplies the custom consumable-selection logic used for Souls.
+`FantasyNewContent.gd` integrates the project with [Yoko-NewContentLoader](https://github.com/CYoJkoY/Yoko-NewContentLoader). It registers custom job resources and supplies project-specific content hooks such as Soul consumable selection.
 
-Soul drops are calculated from the project's configured base chance, player luck, Holy statistics, and the mod's additional Soul-drop statistic. The implementation also caps the luck multiplier, keeping the mechanic bounded in code rather than relying on documentation alone.
+### Resource registration
 
-### Resource-driven content
-
-The main content manifests are:
+The main content resources are:
 
 - `NewContentData.tres` — primary content registration.
 - `NewContentDataDLC1.tres` — additional content registration.
 - `FantasyNewContent.gd` — custom registration and content hooks.
 
-This allows the content itself to remain inspectable as Godot resources while the extension layer handles interactions with existing Brotato systems.
-
 ## Installation
-
-Yoko-Fantasy is intended to run through **Brotato Mod Loader**.
 
 ### Requirements
 
 - Brotato
-- Brotato Mod Loader **6.0.0**
-- [`Yoko-NewContentLoader`](https://github.com/CYoJkoY/Yoko-NewContentLoader)
-- [`Yoko-MoreStatsContainer`](https://github.com/CYoJkoY/Yoko-MoreStatsContainer)
+- **Brotato Mod Loader 6.3.0**
+- [Yoko-NewContentLoader](https://github.com/CYoJkoY/Yoko-NewContentLoader)
+- [Yoko-MoreStatsContainer](https://github.com/CYoJkoY/Yoko-MoreStatsContainer)
 
-These are the dependencies currently declared by `manifest.json`. The manifest does not currently declare a compatible Brotato game-version list, so game-version compatibility should be verified against the installed mod stack.
+These are the required dependencies declared by `manifest.json`.
 
 ### Release installation
 
-1. Install Brotato and a compatible Brotato Mod Loader.
-2. Install `Yoko-NewContentLoader` and `Yoko-MoreStatsContainer`.
-3. Download the Yoko-Fantasy release ZIP.
-4. Place the ZIP in the Mod Loader `mods` directory according to your Mod Loader installation.
-5. Start Brotato and confirm that the mod and its dependencies are loaded.
+1. Install Brotato and Mod Loader 6.3.0.
+2. Install Yoko-NewContentLoader and Yoko-MoreStatsContainer.
+3. Download the latest `Fantasy-*.zip` from [Releases](https://github.com/CYoJkoY/Yoko-Fantasy/releases).
+4. Place the ZIP in the Mod Loader `mods` directory.
+5. Launch Brotato and verify that the dependency chain loads successfully.
 
-The repository's release workflow builds a Mod Loader package under `mods-unpacked/Yoko-Fantasy/`, generates Godot import data when imported assets require it, validates the resulting ZIP, and publishes the package for tagged releases.
+### Development
 
-### Build from source
-
-```bash
-git clone https://github.com/CYoJkoY/Yoko-Fantasy.git
-cd Yoko-Fantasy
-```
-
-For development, use the same Brotato Mod Loader development layout used by the project. This repository is a **mod source tree**, not a standalone Godot game project, so a normal root `project.godot` is intentionally absent.
+The repository is a mod source tree rather than a standalone Godot game project. Its release workflow creates an isolated temporary Godot project when generating the import cache.
 
 ## Development
 
-The project uses **Godot 3.x-era GDScript and Godot resource files** together with Brotato Mod Loader's script-extension mechanism.
-
-When adding a mechanic, keep the implementation split according to responsibility:
+When adding a mechanic, keep responsibility separated:
 
 ```text
 New mechanic
    │
    ├── Content data / Resource
-   │       └── content/...
+   │      └── content/...
    │
-   ├── Reusable effect / behavior
-   │       └── content/... or extensions/...
+   ├── Reusable behavior
+   │      └── content/... or extensions/...
    │
    ├── Base-game integration
-   │       └── extensions/<system>.gd
+   │      └── extensions/<system>.gd
    │
-   └── Player-facing text
-           └── translations/...
+   └── Localization
+          └── translations/...
 ```
 
-A practical development sequence is:
+A practical workflow is to identify the owning Brotato system first, add the resource data, add only the narrowest required extension, register it in `mod_main.gd`, then update localization and test the complete dependency stack.
 
-1. Identify the Brotato system that owns the behavior.
-2. Add the content resource or reusable behavior under `content/`.
-3. Extend the corresponding base-game script under `extensions/` only when integration is required.
-4. Register the extension in `mod_main.gd`.
-5. Register the content through the NewContent resource pipeline.
-6. Add or update localization resources.
-7. Test with the declared Mod Loader and dependency versions.
+## Release pipeline
 
-Keep extensions focused. If a change belongs to `weapon_service.gd`, `wave_manager.gd`, or `base_shop.gd`, avoid moving that responsibility into an unrelated global script.
-
-## Project Structure
+Releases are driven by semantic version tags. The workflow now treats `manifest.json` as authoritative and refuses to package mismatched versions:
 
 ```text
-Yoko-Fantasy/
-├── .github/
-│   └── workflows/
-│       └── release.yml              # Release packaging and validation
-├── assets/                          # Repository-level visual assets
-├── content/
-│   ├── attack_behaviors/            # Custom attack logic
-│   ├── characters/                  # Character resources and effects
-│   ├── entities/                    # Enemies, pets, turrets, and entities
-│   ├── items/                       # Item resources
-│   ├── jobs/                        # Job definitions
-│   ├── maps/                        # Background and map resources
-│   ├── specials/                    # Special gameplay entities/behaviors
-│   ├── weapons/                     # Melee and ranged weapons
-│   ├── zones/                       # Fantasy zone data
-│   └── ...                          # Additional content resources
-├── extensions/                      # Brotato base-game extensions
-├── translations/                    # Localization resources
-├── FantasyNewContent.gd             # Custom NewContent integration
-├── NewContentData.tres              # Main content registration
-├── NewContentDataDLC1.tres          # Additional content registration
-├── manifest.json                    # Mod metadata and dependencies
-├── mod_main.gd                      # Mod Loader entry point
-└── LICENSE
+manifest.json: 1.1.0
+        │
+        ├── tag v1.1.0  → build allowed
+        └── tag v1.2.0  → build rejected
 ```
 
-The exact content tree is intentionally broader than the summary above; `content/` is the data-heavy part of the project, while `extensions/` contains the integration layer.
-
-## Release Pipeline
-
-Releases are automated through `.github/workflows/release.yml`.
-
-The workflow is designed around the actual Mod Loader packaging requirements rather than simply zipping the Git repository:
-
-```text
-Git tag vX.Y.Z
-      │
-      ▼
-Validate version tag
-      │
-      ▼
-Read manifest metadata
-      │
-      ▼
-Create temporary Godot project
-      │
-      ▼
-Import assets with Godot
-      │
-      ▼
-Stage mods-unpacked/Yoko-Fantasy/
-      │
-      ├── include generated .import data when required
-      ├── exclude repository-only CI metadata
-      └── update manifest version for the release
-      │
-      ▼
-Build + verify ZIP
-      │
-      ▼
-Upload artifact + GitHub Release
-```
-
-The workflow validates the `vX.Y.Z` tag format, checks the manifest, imports resources with Godot 3.7-dev1, verifies the ZIP structure, checks the packaged manifest version, and publishes the resulting release artifact.
-
-This distinction matters for this project because imported Godot assets are part of the runtime packaging process even though the generated import directory is not committed to the repository.
+The pipeline also imports Godot resources, checks for import errors, creates the Mod Loader package, preserves generated `.import` data, verifies ZIP structure, and checks the packaged manifest before publishing.
 
 ## Compatibility
 
-The current `manifest.json` declares the following metadata:
-
-| Component | Declared value |
+| Component | Declared target |
 | :--- | :--- |
-| Mod name | `Fantasy` |
-| Namespace | `Yoko` |
-| Repository | `Yoko-Fantasy` |
-| Mod version | `0.0.1` |
-| Mod Loader | `6.0.0` |
-| Required dependency | `Yoko-NewContentLoader` |
-| Required dependency | `Yoko-MoreStatsContainer` |
-| Compatible Brotato versions | Not specified |
-| Authors | `CYoJkoY`, `CaveGood` |
+| Engine | Godot 3.x / GDScript |
+| Mod Loader | **6.3.0** |
+| Mod version | **1.1.0** |
+| Dependencies | Yoko-NewContentLoader, Yoko-MoreStatsContainer |
+| Brotato game version | Not specified |
+| Authors | CYoJkoY, CaveGood |
+| License | MIT |
 
-The manifest is the source of truth for the declared dependency and Mod Loader requirements. Do not interpret an empty `compatible_game_version` array as a claim of universal Brotato compatibility.
+The manifest is the source of truth for declared compatibility. An empty `compatible_game_version` array is not a universal compatibility guarantee.
+
+## Project structure
+
+```text
+Yoko-Fantasy/
+├── .github/workflows/release.yml
+├── content/
+│   ├── attack_behaviors/
+│   ├── characters/
+│   ├── entities/
+│   ├── items/
+│   ├── jobs/
+│   ├── maps/
+│   ├── specials/
+│   ├── weapons/
+│   ├── zones/
+│   └── ...
+├── extensions/
+├── translations/
+├── FantasyNewContent.gd
+├── NewContentData.tres
+├── NewContentDataDLC1.tres
+├── manifest.json
+├── mod_main.gd
+├── README.md
+└── LICENSE
+```
 
 ## Contributing
 
 Bug reports, gameplay feedback, balance observations, content contributions, and code changes are useful.
 
-When reporting a problem, include:
-
-- Brotato version
-- Mod Loader version
-- Yoko-Fantasy version
-- versions of both required dependencies
-- reproduction steps
-- relevant logs or screenshots when available
-
-For code changes, preserve the project's separation between content resources and base-game extensions. New behavior should be attached to the narrowest appropriate extension point rather than added as a monolithic system.
-
-## Project Members
-
-The current manifest credits:
-
-- **CYoJkoY**
-- **CaveGood**
+For a reproducible report, include the Brotato version, Mod Loader version, Yoko-Fantasy version, dependency versions, reproduction steps, and relevant logs or screenshots.
 
 ## License
 
-Yoko-Fantasy is distributed under the **MIT License**. See [`LICENSE`](LICENSE) for the complete text.
+Yoko-Fantasy is distributed under the [MIT License](LICENSE).
 
 ## Support the Author
 
-If this project saves you time or improves your Brotato modding workflow, consider supporting its continued development.
+If this project saves you time while playing or developing Brotato mods, consider supporting its continued development.
 
 <div align="center">
   <a href="https://cyojkoy.github.io/Payment/">
@@ -309,7 +201,5 @@ If this project saves you time or improves your Brotato modding workflow, consid
 ---
 
 <div align="center">
-
-**Yoko-Fantasy** · Fantasy gameplay systems and content for Brotato
-
+  <sub>Yoko-Fantasy · Fantasy gameplay systems and content for Brotato</sub>
 </div>
