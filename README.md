@@ -83,7 +83,7 @@ The main content resources are:
 
 ### Requirements
 
-- Brotato
+- Brotato **1.15.4**
 - **Brotato Mod Loader 6.3.0**
 - [Yoko-NewContentLoader](https://github.com/CYoJkoY/Yoko-NewContentLoader)
 - [Yoko-MoreStatsContainer](https://github.com/CYoJkoY/Yoko-MoreStatsContainer)
@@ -92,7 +92,7 @@ These are the required dependencies declared by `manifest.json`.
 
 ### Release installation
 
-1. Install Brotato and Mod Loader 6.3.0.
+1. Install Brotato 1.15.4 and Mod Loader 6.3.0.
 2. Install Yoko-NewContentLoader and Yoko-MoreStatsContainer.
 3. Download the latest `Fantasy-*.zip` from [Releases](https://github.com/CYoJkoY/Yoko-Fantasy/releases).
 4. Place the ZIP in the Mod Loader `mods` directory.
@@ -126,7 +126,7 @@ A practical workflow is to identify the owning Brotato system first, add the res
 
 ## Release pipeline
 
-Releases are driven by semantic version tags. The workflow now treats `manifest.json` as authoritative and refuses to package mismatched versions:
+Releases are driven by semantic version tags. The workflow treats `manifest.json` as authoritative and refuses to package mismatched versions:
 
 ```text
 manifest.json: 1.1.0
@@ -145,11 +145,11 @@ The pipeline also imports Godot resources, checks for import errors, creates the
 | Mod Loader | **6.3.0** |
 | Mod version | **1.1.0** |
 | Dependencies | Yoko-NewContentLoader, Yoko-MoreStatsContainer |
-| Brotato game version | Not specified |
+| Brotato game version | **1.15.4** |
 | Authors | CYoJkoY, CaveGood |
 | License | MIT |
 
-The manifest is the source of truth for declared compatibility. An empty `compatible_game_version` array is not a universal compatibility guarantee.
+The manifest is the source of truth for declared compatibility.
 
 ## Project structure
 
