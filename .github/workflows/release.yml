@@ -173,6 +173,7 @@ jobs:
             sleep 1
           done
           if (( FINISHED == 0 && $(date +%s) >= DEADLINE )); then echo '::error::Godot resource import did not reach a stable state within 300 seconds.'; cat "$LOG_FILE" >&2 || true; exit 1; fi
+          if kill -0 "$GODOT_PID" 2>/dev/null; then echo 'Import cache validation complete; stopping Godot.'; kill "$GODOT_PID" 2>/dev/null || true; fi
           wait "$GODOT_PID" 2>/dev/null || true
           PROJECT="$PROJECT" MOD_ROOT="$MOD_ROOT" python3 - <<'PY'
           import os, re
@@ -218,7 +219,6 @@ jobs:
           find "$STAGE" -type f \( -name '.gdignore' -o -name '*.md5' -o -name '*.csv.import' \) -delete
           (cd "$STAGE" && zip -r -q -9 -n '.png:.webp:.jpg:.jpeg:.gif:.bmp:.ico:.dds:.stex:.ctex:.ogg:.oggstr:.mp3:.aac:.m4a:.mp4:.webm:.zip:.7z:.rar:.gz:.bz2:.xz:.zst' "$ZIP" .)
           test -s "$ZIP"; sha256sum "$ZIP" > "$ZIP.sha256"
-
       - name: Verify release package
         env:
           MOD_DIRECTORY: ${{ steps.manifest.outputs.mod_directory }}
@@ -236,13 +236,12 @@ jobs:
           if [[ "$HAS_IMPORT" == 'true' ]] && ! grep -Eq '^\.import/[^/]+$|^\.import/.+/.+$' "$LISTING"; then echo '::error::Generated .import cache is missing from the release package.'; exit 1; fi
           unzip -p "$ZIP" "$MANIFEST_PATH" > "$RUNNER_TEMP/release-manifest.json"
           VERSION="$VERSION" MANIFEST="$RUNNER_TEMP/release-manifest.json" python3 - <<'PY'
-          import json, os
+          import json,os
           from pathlib import Path
           expected=os.environ['VERSION']; actual=json.loads(Path(os.environ['MANIFEST']).read_text(encoding='utf-8')).get('version_number')
           if actual != expected: raise SystemExit(f'Release manifest version mismatch: {actual!r} != {expected!r}')
           print(f'Manifest version verified: {actual}')
           PY
-
       - name: Upload release assets
         uses: actions/upload-artifact@v6
         with:
@@ -253,7 +252,6 @@ jobs:
           if-no-files-found: error
           compression-level: 0
           retention-days: 30
-
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
