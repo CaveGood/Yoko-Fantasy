@@ -1,6 +1,4 @@
 <div align="center">
-  <img src="assets/hero.svg" alt="Yoko-Fantasy — systems-heavy fantasy expansion for Brotato" width="1200" style="max-width: 100%; height: auto;">
-
   <h1>Yoko-Fantasy</h1>
   <p><strong>A systems-heavy fantasy expansion for Brotato, combining content with mechanics that attach to existing game systems.</strong></p>
   <p>Jobs · Souls · Holy · Erosion · Combat · Enemies · Worlds · UI</p>
