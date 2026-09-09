@@ -1,5 +1,5 @@
 extends "res://singletons/player_run_data.gd"
-    
+
 var jobs: Dictionary = {}
 var fantasy_synthesis_pity_data: Dictionary = {}
 
@@ -48,7 +48,7 @@ static func init_stats(all_null_values: bool = false) -> Dictionary:
         var vanilla_stats =.init_stats(all_null_values)
 
         var new_stats: Dictionary = {
-            
+
             Utils.stat_fantasy_holy_hash: 0,
             Utils.stat_fantasy_soul_hash: 0,
             Utils.stat_fantasy_decaying_slow_enemy_hash: 0,
@@ -103,6 +103,7 @@ static func init_effects() -> Dictionary:
             Utils.fantasy_dmg_when_pickup_consumable_hash: [],
             Utils.fantasy_periodic_radius_damage_hash: [],
             Utils.fantasy_base_chance_drop_soul_hash: 0,
+            Utils.fantasy_soul_duration_hash: 0,
             Utils.fantasy_tree_radius_tempstats_hash: [],
             Utils.fantasy_cannot_damage_tree_hash: 0,
             Utils.fantasy_bonus_drop_from_target_hash: [],
@@ -131,7 +132,7 @@ static func init_effects() -> Dictionary:
             Utils.fantasy_weapon_hit_proc_hash: [],
 
         }
-        
+
         new_effects.merge(mod_stats)
         new_effects.merge(vanilla_effects)
 

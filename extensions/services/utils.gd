@@ -15,6 +15,7 @@ var job_fantasy_luck_hash: int = Keys.generate_hash("job_fantasy_luck")
 var job_fantasy_melee_hash: int = Keys.generate_hash("job_fantasy_melee")
 var job_fantasy_ranged_hash: int = Keys.generate_hash("job_fantasy_ranged")
 var job_fantasy_universal_hash: int = Keys.generate_hash("job_fantasy_universal")
+var job_fantasy_holy_hash: int = Keys.generate_hash("job_fantasy_holy")
 
 func fa_is_damage_job_way(way_hash: int) -> bool:
 	return [
@@ -66,6 +67,7 @@ var fantasy_limited_item_bonuses_hash: int = Keys.generate_hash("fantasy_limited
 var fantasy_dmg_when_pickup_consumable_hash: int = Keys.generate_hash("fantasy_dmg_when_pickup_consumable")
 var fantasy_periodic_radius_damage_hash: int = Keys.generate_hash("fantasy_periodic_radius_damage")
 var fantasy_base_chance_drop_soul_hash: int = Keys.generate_hash("fantasy_base_chance_drop_soul")
+var fantasy_soul_duration_hash: int = Keys.generate_hash("fantasy_soul_duration")
 var fantasy_tree_radius_tempstats_hash: int = Keys.generate_hash("fantasy_tree_radius_tempstats")
 var fantasy_cannot_damage_tree_hash: int = Keys.generate_hash("fantasy_cannot_damage_tree")
 var fantasy_bonus_drop_from_target_hash: int = Keys.generate_hash("fantasy_bonus_drop_from_target")
@@ -176,6 +178,7 @@ func fa_get_job_category_text(job_data: UpgradeData) -> String:
 		job_fantasy_luck_hash: category_text = "JOB_LUCK"
 		job_fantasy_melee_hash: category_text = "JOB_MELEE"
 		job_fantasy_ranged_hash: category_text = "JOB_RANGED"
+		job_fantasy_holy_hash: category_text = "JOB_HOLY"
 		job_fantasy_universal_hash: category_text = "JOB_UNIVERSAL"
 
 	var stage_text: String = ""

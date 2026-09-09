@@ -1,4 +1,8 @@
 keys,en,fr,zh,ja,ko,zh_TW,ru,pl,es,pt,de,tr,it
+JOB_HOLY,Holy,Saint,神圣,ホーリー,신성,神聖,Святость,Świętość,Sagrado,Sagrado,Heilig,Kutsal,Sacro
+"JOB_FANTASY_STARCALLER","Starcaller","Invocateur d'étoiles","唤星者","スターコーラー","스타콜러","喚星者","Звездочёт","Gwiezdny Przywoływacz","Invocador de Estrellas","Invocador de Estrelas","Sternrufer","Yıldız Çağıran","Invocatore di Stelle"
+"JOB_FANTASY_SANCTIFIER","Sanctifier","Sanctificateur","圣道信徒","聖道の信徒","성도의 신자","聖道信徒","Освятитель","Uświęciciel","Santificador","Santificador","Heiliger","Kutsayıcı","Santificatore"
+"EFFECT_FANTASY_SOUL_DURATION","Soul duration {0} seconds","Durée de l'âme : {0} secondes","魂的持续时间{0}秒","魂の持続時間{0}秒","영혼 지속 시간 {0}초","魂的持續時間{0}秒","Длительность души: {0} сек.","Czas trwania duszy: {0} sek.","Duración del alma: {0} segundos","Duração da alma: {0} segundos","Seelendauer: {0} Sekunden","Ruh süresi: {0} saniye","Durata dell'anima: {0} secondi"
 FANTASY_MOD_NAME,Sylvan Fantasy,Fantaisie sylvestre,幻界树海,シルヴァン・ファンタジー,실반 판타지,幻界樹海,Лесная фантазия,Leśna fantazja,Fantasía silvana,Fantasia silvestre,Waldfantasie,Orman Fantazisi,Fantasia silvestre
 WEAPON_FANTASY_FINGER_SNAP,Finger Snap,Claquement de doigts,响指,指パッチン,손가락 튕기기,響指,Щелчок пальцами,Pstryknięcie palcami,Chasquido de dedos,Estalo de dedos,Fingerschnippen,Parmak Şıklatma,Schiocco di dita
 WEAPON_FANTASY_HANDBELL,Handbell,Clochette,手摇铃,ハンドベル,핸드벨,手搖鈴,Ручной колокольчик,Dzwonek ręczny,Campanilla,Sino de mão,Handglocke,El çanı,Campanella

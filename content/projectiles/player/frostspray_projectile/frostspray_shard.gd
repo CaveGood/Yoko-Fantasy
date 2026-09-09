@@ -54,7 +54,7 @@ func launch_advanced(
 	_main = main
 	_pool_id = pool_id
 	_opacity = FantasyProjectileVisualUtils.get_opacity()
-	_damage = max(1, damage)
+	_damage = int(max(1, damage))
 	_player_index = player_index
 	_weapon_pos = weapon_pos
 	_crit_chance = crit_chance
