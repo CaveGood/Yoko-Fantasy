@@ -27,7 +27,7 @@ func install_script_extensions() -> void:
         #          slow_cursed_enemy,
         #          time_bonus_current_health_damage
         #          random_reload_when_picked_up_gold
-    
+
         "services/item_service.gd",
         # SYSTEMS: Job[ 2/6 ]
         # ITEMS: Erosion Items
